@@ -1,0 +1,5 @@
+[[source]]
+name = "exynos8890"
+kind = "soc"
+git = "https://github.com/DokuroMitsukai/UniXNU-exynos8890-common"
+commit = "6a7cdae40b90d1bf2310b1baecf9aa43c4d870bc"

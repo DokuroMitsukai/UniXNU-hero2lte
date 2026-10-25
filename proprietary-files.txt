@@ -1,0 +1,8 @@
+# Firmware paths and SHA-256 digests for scripts/extract-files.py.
+# Files are written under .cache/firmware/.
+# Format: path|sha256. Prefix a path with - for an optional file.
+#
+# Phase 1 uses no vendor blobs: S-Boot leaves the framebuffer and keypad
+# registers accessible, and no storage, display or network driver runs yet.
+# Add Wi-Fi, touch and GPU firmware here with their hashes when those
+# components are selected.

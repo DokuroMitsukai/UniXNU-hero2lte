@@ -1,0 +1,73 @@
+schema_version = 2
+
+[board]
+name = "hero2lte"
+soc = "Exynos 8890"
+soc_source = "exynos8890"
+os_profile = "ipados-17.7.11-21H461"
+description = "Samsung Galaxy S7 Edge (SM-G935F)"
+kit = "hero2lte"
+
+[components]
+include = ["ArmDTPlatform", "ArmCpu", "SoftwareAES", "XnuPrelink", "DarwinBoot"]
+
+[kernel]
+defconfig = "hero2lte_defconfig"
+config_fragments = ["arch:configs/common.config", "soc:configs/exynos8890.config", "os:configs/ipados.config"]
+patch_series = ["arch:patches/xnu/series", "soc:patches/xnu/series", "os:patches/xnu/series", "device:patches/xnu/series"]
+
+[device_tree]
+source = "device:dts/hero2lte.dts"
+include_dirs = ["soc:dts"]
+
+[firmware]
+config = "hero2lte"
+dsc = "Platforms/Samsung/hero2ltePkg/hero2lte.dsc"
+fd = "Build/hero2ltePkg/{target}_CLANGPDB/FV/SILICIUM_UEFI.fd"
+submodules = ["Binaries", "Common/Mu", "Common/Mu_OEM_Sample", "Silicium-ACPI", "Silicon/Silicium/OpensslPkg/Library/OpensslLib/openssl"]
+patches = ["Resources/MuPatches/AsmMacroLib.patch", "Resources/MuPatches/Auth-Service.patch", "Resources/MuPatches/Boot-Manager.patch", "Resources/MuPatches/Timer.patch", "Resources/MuPatches/Usb-Bus.patch"]
+packages = [
+  "{uefi}",
+  "{uefi}/Platforms/Samsung",
+  "{uefi}/Common/Mu",
+  "{uefi}/Common/Mu_OEM_Sample",
+  "{edk2}",
+  "{uefi}/Silicon/Samsung",
+  "{uefi}/Silicon/Silicium",
+  "{uefi}/Silicium-ACPI",
+  "{uefi}/Silicium-ACPI/Platforms/Samsung",
+  "{uefi}/Silicium-ACPI/Silicon/Samsung",
+  "{tree}/package",
+  "{tree}/drivers/DarwinBoot",
+]
+
+[firmware.defines]
+BUILDID_STRING = "hero2lte-research"
+DEVICE_MODEL = "0"
+ENABLE_SECUREBOOT = "0"
+MEMORY_PROTECTION = "TRUE"
+SHIP_MODE = "FALSE"
+UNIXNU_PAYLOAD = "1"
+
+[bootimg.image]
+base = 0x10000000
+kernel_offset = 0x8000
+tags_offset = 0x100
+pagesize = 2048
+header_version = 0
+
+[payload]
+volume = "HERO2LTE"
+size_mib = 192
+loader = "firmware"
+title = "UniXNU"
+kernel_args = ["-v", "serial=3"]
+
+[payload.adt]
+# Identity seed for the iPadOS 17.7.11 profile, matching the shared UniXNU
+# device configuration. The unique seed is supplied per build.
+chip_id = "207"
+unique_chip_id = "required"
+
+# [payload.adt] identity and root inputs are added with the Phase 2 payload.
+# [userdata] geometry is added after the verified EFS/CPEFS backup and wipe approval.

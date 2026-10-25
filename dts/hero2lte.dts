@@ -1,0 +1,37 @@
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// Samsung Galaxy S7 Edge (SM-G935F). Memory and reservations come from the
+// stock G935FXXS6ESI4 boot DTB. Only the boot CPU is enabled for the first
+// bring-up; the SoC DTSI describes all eight cores.
+/dts-v1/;
+/include/ "exynos8890.dtsi"
+
+/ {
+    model = "Samsung Galaxy S7 Edge (SM-G935F)";
+    compatible = "samsung,hero2lte", "samsung,exynos8890";
+
+    memory@80000000 {
+        device_type = "memory";
+        reg = <0 0x80000000 0 0x7e400000>;
+    };
+
+    reserved-memory {
+        #address-cells = <2>;
+        #size-cells = <2>;
+        ranges;
+
+        framebuffer@e2a00000 {
+            label = "cont_splash_region";
+            reg = <0 0xe2a00000 0 0xe10000>;
+            no-map;
+        };
+    };
+};
+
+&cpu1 { status = "disabled"; };
+&cpu2 { status = "disabled"; };
+&cpu3 { status = "disabled"; };
+&cpu4 { status = "disabled"; };
+&cpu5 { status = "disabled"; };
+&cpu6 { status = "disabled"; };
+&cpu7 { status = "disabled"; };

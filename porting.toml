@@ -32,11 +32,11 @@ completion = [
   "All source pins resolve; every selected component has an area; status shows the intended profiles and patch order.",
 ]
 limits = [
-  "The SoC feed is not published yet, so local verification uses an ignored local.toml override.",
+  "The published SoC feed is pinned in feeds.toml and unixnu.lock; fetch succeeds without a local source override.",
   "No hardware checkpoint exists for this board.",
 ]
 next_action = [
-  "Publish UniXNU-exynos8890-common and pin its reviewed commit in feeds.toml.",
+  "Keep the published SoC revision synchronized between feeds.toml and unixnu.lock.",
 ]
 
 [[area.evidence]]

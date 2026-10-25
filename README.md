@@ -9,6 +9,7 @@ support in ArmCpu and native storage, display, input and power drivers.
 - The shared SoC tree describes eight cores, PSCI 0.2, GIC-400 and the 26 MHz
   timer. Only `cpu0` is enabled for the first bring-up.
 - The Mu-Silicium firmware builds and its BootShim and keypad host tests pass.
+- The UniXNU-integrated firmware builds with the loader, RAM disk and DarwinBoot in the FD. No payload or hardware boot exists yet.
 - Hardware boot is not validated. `ArmCpu` registers GICv3 only, so no XNU
   kernel can start on this board yet.
 - EFS and CPEFS have no verified backup. Do not wipe or repartition.

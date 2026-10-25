@@ -8,7 +8,7 @@ summary = "Samsung Galaxy S7 Edge (SM-G935F) on Exynos 8890. Phase 1 is a Mu-Sil
 
 [[area]]
 id = "configuration"
-status = "implemented"
+status = "host-verified"
 components = []
 paths = ["board.toml", "feeds.toml", "configs/**", "dts/**", ".github/**", ".gitignore"]
 inputs = [
@@ -21,6 +21,7 @@ configuration = [
 ]
 procedure = [
   "Run ./unixnu defconfig hero2lte_defconfig -D ../UniXNU-hero2lte from UniXNU.",
+  "Run ./unixnu fetch -D ../UniXNU-hero2lte to resolve base sources and write unixnu.lock.",
   "Run ./unixnu status --json -D ../UniXNU-hero2lte and review profiles, components, source pins and patch order.",
 ]
 findings = [
@@ -43,9 +44,16 @@ kind = "source"
 reference = "board.toml"
 result = "Board identity, component selection, firmware paths and boot image parameters"
 
+[[area.evidence]]
+kind = "host"
+reference = "unixnu.lock"
+command = "./unixnu status --json -D ../UniXNU-hero2lte"
+revision = "e9fb02f99c4cc2e6c882b1c2b6443fd342bc85e0"
+result = "schema_version 2 resolved the arch, exynos8890, iPadOS and device profiles with the selected components and patch series"
+
 [[area]]
 id = "firmware"
-status = "implemented"
+status = "host-verified"
 components = ["DarwinBoot"]
 paths = ["proprietary-files.txt"]
 inputs = [
@@ -59,6 +67,7 @@ configuration = [
 procedure = [
   "The standalone build runs ./build-hero2lte.sh -c at the workspace root; test_bootshim.py and test_hero2lte_keypad.py pass.",
   "The DSC and DXE.inc add UniXNU.inf, UniXNUDxe.inf, UniXNURamDiskDxe.inf, DarwinBoot.inf, DiskIoDxe, PartitionDxe, EnglishDxe and Fat behind UNIXNU_PAYLOAD=1.",
+  "./unixnu build firmware --uefi ../Mu-Silicium --target RELEASE -D ../UniXNU-hero2lte applies the five base patches and builds the 2 MiB FD.",
 ]
 findings = [
   "The standalone image is an Android v0 header at 0x10000000 with kernel at 0x10008000 and tags at 0x10000100; the kernel field is exactly BootShim plus the 2 MiB FD.",
@@ -81,6 +90,13 @@ next_action = [
 kind = "source"
 reference = "https://github.com/DokuroMitsukai/Mu-Silicium/commit/5790015a98714044d72d5037cea300b40f66a2e0"
 result = "hero2lte firmware package, keypad library, host tests and optional UniXNU payload integration"
+
+[[area.evidence]]
+kind = "host"
+reference = "board.toml"
+command = "./unixnu build firmware --uefi ../Mu-Silicium --target RELEASE -D ../UniXNU-hero2lte"
+revision = "5790015a98714044d72d5037cea300b40f66a2e0"
+result = "2 MiB SILICIUM_UEFI.fd contains UniXNU, UniXNUDxe, UniXNURamDiskDxe and DarwinBoot; FVMAIN used 0x235000 and FVMAIN_COMPACT kept 0x194998 free"
 
 [[area]]
 id = "cpu"

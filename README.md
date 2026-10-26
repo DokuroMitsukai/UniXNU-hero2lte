@@ -37,25 +37,32 @@ The device selects the iPadOS 17.7.11 build 21H461 profile, the only profile in
 this UniXNU revision. The firmware is the Mu-Silicium fork at
 `Platforms/Samsung/hero2ltePkg`.
 
-The GICv2 commits are not in `UniXNU/ArmCpu` yet. Until they are, build against
-the fork with a gitignored `local.toml` (the sibling checkout layout):
+The GICv2 commits are not in `UniXNU/ArmCpu` yet, so the `drivers/ArmCpu`
+submodule points at the fork commit `c9c4bd8`. Run `git submodule update
+--init --recursive` after pulling and check `unixnu status`:
+
+```sh
+./unixnu status --json -D ../UniXNU-hero2lte | python3 -c \
+  'import json,sys; print([m for m in json.load(sys.stdin)["modules"] if m["name"] == "ArmCpu"])'
+```
+
+`status` must report revision `c9c4bd8`. If your checkout still has the
+upstream submodule pointer, either update it or use the gitignored `local.toml`
+override with a sibling fork clone:
 
 ```sh
 git clone https://github.com/DokuroMitsukai/ArmCpu.git ../ArmCpu
-git -C ../ArmCpu checkout fba847b
+git -C ../ArmCpu checkout c9c4bd8
 cat > ../UniXNU-hero2lte/local.toml <<'EOF'
 [[source]]
 kind = "driver"
 name = "ArmCpu"
 local = "../ArmCpu"
 EOF
-./unixnu status --json -D ../UniXNU-hero2lte | python3 -c \
-  'import json,sys; print([m for m in json.load(sys.stdin)["modules"] if m["name"] == "ArmCpu"])'
 ```
 
-`status` must report `"local": true`, `"origin": "local (feeds)"` and revision
-`fba847b`. Without the override the submodule supplies the older upstream
-revision and the kernel will not map the hero2lte GIC.
+The override reports `"local": true` and `"origin": "local (feeds)"`; without
+the GICv2 code the kernel cannot map the hero2lte GIC.
 
 ## Inputs
 

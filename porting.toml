@@ -154,8 +154,8 @@ result = "UEFI GICv2 and timer interrupt handling observed on hardware; ArmCpu's
 
 [[area.evidence]]
 kind = "source"
-reference = "https://github.com/DokuroMitsukai/ArmCpu/commit/fba847bd4488e8b7bb715a91ba87e59d8fffbb66"
-result = "Four-range GICv2 device tree and identity arm-io ranges, distributor, banked CPU interface, PPI 27 timer, GICD_SGIR IPI, firmware-owned interrupt group and QEMU GIC-400 test"
+reference = "https://github.com/DokuroMitsukai/ArmCpu/commit/c9c4bd87cabc1fe6736e171cd2540313ac4b7883"
+result = "Four-range GICv2 device tree, 24-byte arm-io range translation, distributor, banked CPU interface, PPI 27 timer, GICD_SGIR IPI, firmware-owned interrupt group and QEMU GIC-400 test"
 
 [[area]]
 id = "memory"

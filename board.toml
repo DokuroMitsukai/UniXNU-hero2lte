@@ -58,7 +58,11 @@ header_version = 0
 
 [payload]
 volume = "HERO2LTE"
-size_mib = 192
+# BOOT is 40 MiB and the kernel alone is 51 MB, so the payload stores it UEFI-compressed and
+# DarwinBoot inflates it. The volume only has to hold the compressed kernel, the ADT and the
+# configuration; size_mib includes the Data seed once one is supplied.
+size_mib = 16
+compress = "uefi"
 loader = "firmware"
 title = "UniXNU"
 kernel_args = ["-v", "serial=3"]

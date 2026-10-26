@@ -1,0 +1,51 @@
+hero2lte UEFI hardware checkpoint
+================================
+
+Date:       2026-10-26
+Device:     Samsung Galaxy S7 Edge SM-G935F (hero2lte), Exynos 8890
+Bootloader: G935FXXS6ESI4
+Recovery:   TWRP 3.7.0_9-AJ, RECOVERY partition unchanged
+Source:     Mu-Silicium 9f984f86636492269fff9297163d98b89c3cea65
+
+Images
+------
+
+safemem  out/boot-uefi-samsung-safemem.img
+         sha256 7b340d3e1a7858c8a5ddf2f2766af31d261e926d50f45921939af3bacdb86624
+         FD/stack/heap at 0xB1200000-0xBFF40000
+
+bringup  out/boot-uefi-samsung-bringup.img
+         sha256 011d3abf67c757181e1e308da3ecdfb45db91333e161eed395661db92a6856d3
+         safemem plus BringupTestDxe
+
+Procedure
+---------
+
+The image was pushed to /tmp in TWRP, written to /dev/block/sda5 with dd,
+synced, and the partition was read back with sha256sum.  The readback hash
+matched the image before each boot.
+
+Results
+-------
+
+1. safemem: reached the Project Silicium UEFI UI and the expected
+   "failed to find an operating system" screen.
+
+2. bringup: the 120 px block at the top left alternated magenta and cyan about
+   once per second.
+
+3. bringup: key presses produced the expected bars:
+   Volume Up red, Volume Down green, Home blue, Power white.
+
+4. bringup: white counter blocks appeared at the lower left and advanced with
+   accepted key events.
+
+5. The phone was manually rebooted to TWRP after the test.  It did not reset by
+   itself while the probe was running.
+
+Not covered
+-----------
+
+XNU handoff, ArmCpu GICv2 support, ARM generic-timer events through the XNU
+interrupt path, storage, and power management were not exercised.  BringupTestDxe
+is diagnostic and is not part of the XNU firmware configuration.

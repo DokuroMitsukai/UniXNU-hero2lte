@@ -9,10 +9,15 @@ support in ArmCpu and native storage, display, input and power drivers.
 - The shared SoC tree describes eight cores, PSCI 0.2, GIC-400 and the 26 MHz
   timer. Only `cpu0` is enabled for the first bring-up.
 - The Mu-Silicium firmware builds and its BootShim and keypad host tests pass.
-- The UniXNU-integrated firmware builds with the loader, RAM disk and DarwinBoot in the FD. No payload or hardware boot exists yet.
-- Hardware boot is not validated. `ArmCpu` registers GICv3 only, so no XNU
-  kernel can start on this board yet.
-- EFS and CPEFS have no verified backup. Do not wipe or repartition.
+- The standalone Mu-Silicium firmware boots on hardware: the safemem image
+  reached the UEFI UI, and the bring-up probe confirmed the timer, keypad and
+  counter. See `evidence/uefi-bringup-20261026.txt`.
+- The UniXNU-integrated firmware builds with the loader, RAM disk and DarwinBoot
+  in the FD. Its payload and hardware boot are not validated.
+- `ArmCpu` registers GICv3 only, so no XNU kernel can start on this board yet.
+  The next implementation step is GICv2 support for the GIC-400.
+- EFS and CPEFS are captured and integrity-checked; see
+  `evidence/efs-cpefs-backup-20261026.txt`. Do not wipe or repartition.
 
 See [porting.toml](porting.toml) for the per-area record and current limits.
 
@@ -37,7 +42,7 @@ this UniXNU revision. The firmware is the Mu-Silicium fork at
 | SoC | Samsung Exynos 8890 (S5E8890) |
 | RAM | `0x80000000` + `0x7e400000`, upper `0x880000000` + `0x80000000` |
 | Framebuffer | `0xe2a00000`, `0xe10000` |
-| UEFI FD | `0xc9000000`, `0x200000` |
+| UEFI FD | `0xb1200000`, `0x200000` |
 | Boot image | v0, base `0x10000000`, kernel `0x10008000`, tags `0x10000100`, page 2048 |
 | Display | s6e3hf4 `SVC_OCTA`, 1440x2560 |
 | Keypad | `GPA0-3`, `GPA0-4`, `GPA0-5`, `GPA2-4`, active low |

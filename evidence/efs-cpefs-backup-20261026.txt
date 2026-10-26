@@ -1,0 +1,40 @@
+EFS and CPEFS backup record
+===========================
+
+Date: 2026-10-26, TWRP 3.7.0_9-AJ
+
+The EFS and CPEFS partitions were captured from TWRP before any boot image was
+written.  The raw images are kept outside the device repository because they
+contain device-specific data.  Only hashes and verification results are
+recorded here.
+
+CPEFS
+-----
+
+device-dump/phase1-diagnostic-hang-20261026-015000/CPEFS.img
+sha256 c886dcd54083b23afaffc2e3cda8c3376b07ac796cd62996541367b97789c5ae
+The partition hash matched before and after capture.  No later capture differs.
+
+EFS
+---
+
+Two valid snapshots are retained:
+
+device-dump/phase1-diagnostic-hang-20261026-015000/EFS.img
+sha256 12c7ce1132c086fabad82d36920b66e45f7dba094b4f976b585a8b66b3a18ca3
+
+device-dump/efs-live/EFS-20261026-022837.img
+sha256 9dd0c18f131d2922751872b0ff3c425e3eb55a17348d57a3b5d967af960cd1f9
+
+The images differ in six bytes, all in the ext4 superblock: s_mtime/s_wtime,
+s_mnt_count and one byte of s_kbytes_written.  TWRP mounts EFS read/write and
+updated those counters.  e2fsck -fn reports the same 181 files, 1892 blocks and
+no errors for both images.  No file content differs.
+
+The flashed UEFI images have no storage driver and did not write EFS.
+
+Status
+------
+
+Backups exist and are integrity-checked.  No wipe or repartition is approved
+until a storage driver and restore procedure are tested.

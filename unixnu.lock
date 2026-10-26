@@ -13,7 +13,7 @@ commit = "11fba65b12d8830630e248dfa8344caf8b065f26"
 commit = "cfb93724a06ff86ff5ba971413368a7809ee42a5"
 
 [source."exynos8890"]
-commit = "6a7cdae40b90d1bf2310b1baecf9aa43c4d870bc"
+commit = "0258950adf615983aec3c87ca65cb52b2310ec95"
 
 [source."libdispatch"]
 commit = "30fe6a7d945340ce69cef121132f049e810089a5"

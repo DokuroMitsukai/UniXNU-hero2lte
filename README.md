@@ -37,6 +37,26 @@ The device selects the iPadOS 17.7.11 build 21H461 profile, the only profile in
 this UniXNU revision. The firmware is the Mu-Silicium fork at
 `Platforms/Samsung/hero2ltePkg`.
 
+The GICv2 commits are not in `UniXNU/ArmCpu` yet. Until they are, build against
+the fork with a gitignored `local.toml` (the sibling checkout layout):
+
+```sh
+git clone https://github.com/DokuroMitsukai/ArmCpu.git ../ArmCpu
+git -C ../ArmCpu checkout fba847b
+cat > ../UniXNU-hero2lte/local.toml <<'EOF'
+[[source]]
+kind = "driver"
+name = "ArmCpu"
+local = "../ArmCpu"
+EOF
+./unixnu status --json -D ../UniXNU-hero2lte | python3 -c \
+  'import json,sys; print([m for m in json.load(sys.stdin)["modules"] if m["name"] == "ArmCpu"])'
+```
+
+`status` must report `"local": true`, `"origin": "local (feeds)"` and revision
+`fba847b`. Without the override the submodule supplies the older upstream
+revision and the kernel will not map the hero2lte GIC.
+
 ## Inputs
 
 | Item | Value |

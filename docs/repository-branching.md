@@ -14,8 +14,9 @@ shared `UniXNU`/`Mu-Silicium` trees or merging device branches.
 | Shared UEFI loader | `DokuroMitsukai/DarwinBoot` | `bringup/shared-video` | `3f2f304784f8fbfbf2ebfdc8eba3af3577d92967` |
 | Shared CPU/GIC support | `DokuroMitsukai/ArmCpu` | `main` | `c9c4bd87cabc1fe6736e171cd2540313ac4b7883` |
 | Exynos 8890 SoC tree | `DokuroMitsukai/UniXNU-exynos8890-common` | `main` | `0258950adf615983aec3c87ca65cb52b2310ec95` |
+| SM6115 SoC tree | `DokuroMitsukai/UniXNU-sm6115-common` | `main` | `4137c1c1fbe2b3693e5a61985fd01bbacc8fdabc` |
 | S7 Edge device | `DokuroMitsukai/UniXNU-hero2lte` | `main` | `33ca693` |
-| Tab A7 device (primary) | `DokuroMitsukai/UniXNU-gta4l` | `bringup/tab-a7-qemu-fixture` | `a42d674` at the time of writing; use the branch head |
+| Tab A7 device (primary) | `DokuroMitsukai/UniXNU-gta4l` | `bringup/tab-a7-qemu-fixture` | `841077a` at the time of writing; use the branch head |
 
 `DokuroMitsukai/UniXNU` is a fork of `UniXNU/UniXNU`. The device repositories
 are separate repositories; they are not subdirectories of the shared tree.
@@ -36,7 +37,7 @@ reference; it is not the primary device repository.
 | `bringup/shared-video` | `DarwinBoot` | Shared GOP video-base mapping fix. |
 | `bringup/qemu-appleimage4-notes` | `UniXNU-hero2lte` | Cross-port AppleImage4/AMFI QEMU notes. |
 | `bringup/porting-ramdisk` | `UniXNU-hero2lte` | S7 Edge porting record for the S-Boot ramdisk range. |
-| `bringup/tab-a7-qemu-fixture` | `UniXNU-gta4l` | Tab A7 QEMU fixture, ADT/build fixes and shared revision pins. |
+| `bringup/tab-a7-qemu-fixture` | `UniXNU-gta4l` | Tab A7 Format 2 migration, QEMU fixture, SM6115 pin, ADT/build fixes and shared revision pins. |
 | `docs/repository-branching` | `UniXNU-hero2lte` | This document. |
 
 Rules:
@@ -93,6 +94,10 @@ In the Tab A7 workspace:
   `upstream` set to `ilovemykedi`.
 - Its build pins are recorded in
   `src/UniXNU-gta4l/docs/build-revisions.md`.
+- The primary branch is Format 2: `schema_version = 2`, `soc_source = "sm6115"`,
+  the iPadOS 17.7.11 OS profile, a board DTS and the common ADT generator.
+- `feeds.toml` pins `UniXNU-sm6115-common` at `4137c1c1`; `unixnu.lock` is
+  committed.
 
 Do not treat the NoNameBuilder checkout as a second source of truth. Its
 uncommitted `board.toml` and `configs/gta4l_defconfig` contain test settings
@@ -137,10 +142,17 @@ S7 Edge device repository:
 
 Tab A7 device repository:
 
-- The primary device branch is clean and pinned.
+- The primary device branch is clean and Format 2.
+- `feeds.toml` pins `UniXNU-sm6115-common` at `4137c1c1`.
+- `dts/gta4l.dts` includes `sm6115.dtsi`; the common generator produced a
+  13,552-byte ADT with `/options`, the CHRP NVRAM proxy,
+  `crypto-hash-method=sha2-384` and `amfi-only-platform-code`.
 - The NoNameBuilder reference retains the uncommitted test settings:
   `ENABLE_SECUREBOOT=0`, `CONFIG_XNU_NATIVE_PAN=n`, the smaller payload, the
   reset probes and the `cs_enforcement_disable` argument.
+- The primary `board.toml` still carries `amfi_get_out_of_my_way=1` and
+  `cs_enforcement_disable=1`; these are pre-existing test arguments despite
+  `ENABLE_SECUREBOOT=1` and need an explicit policy decision.
 
 ## 7. Build and validation status
 
@@ -152,6 +164,18 @@ Host checks that pass:
 - `python3 scripts/check-gta4l.py` in the Tab A7 device repo
 - `python3 scripts/qemu-smoke.py --help`
 - `./unixnu status --json -D ../UniXNU-gta4l`
+- `python3 scripts/porting-record.py check --device ../UniXNU-gta4l`
+- `dtc -I dts -O dtb -i ../UniXNU-sm6115-common/dts ...`
+- `python3 scripts/make-adt.py --dtb ... --os-profile ... --board ../UniXNU-gta4l/board.toml ...`
+
+Format 2 validation:
+
+- The resolver reports `schema_version 2` with arch/SM6115/OS/device profiles
+  and output `out/gta4l/ipados-17.7.11-21H461/gta4l`.
+- The board DTS compiles against `sm6115.dtsi`.
+- The generated ADT has `/chosen`, `/cpus`, `/psci`, `/arm-io`, `/defaults`,
+  `/options` and `/product`, plus the CHRP NVRAM proxy,
+  `crypto-hash-method=sha2-384` and `amfi-only-platform-code`.
 
 Firmware builds:
 
@@ -208,6 +232,13 @@ When updating shared revisions:
   not include it in a commit unless the change is intentional and reviewed.
 - S7 Edge `ENABLE_SECUREBOOT=0`: do not describe the current firmware as
   security-preserving.
+- Tab A7 sets `ENABLE_SECUREBOOT=1` but still carries
+  `amfi_get_out_of_my_way=1` and `cs_enforcement_disable=1` in its kernel
+  arguments. Decide the AMFI policy before claiming a clean boot.
+- The gta4l `scripts/make-gta4l-adt.py` is a legacy format-1 generator. Use
+  `dts/gta4l.dts` with the common ADT generator for Format 2.
+- SM6115 hardware values stay in `UniXNU-sm6115-common`; do not copy them into
+  the ARM64 or OS profiles.
 - Linux kernel build: `tcsh` and `unifdef` may be missing; the XNU bootstrap
   object set must be complete before the corecrypto archive step.
 - QEMU AppleImage4 `/options` findings are cross-port input requirements, not
@@ -219,6 +250,10 @@ When updating shared revisions:
   `bringup/qemu-appleimage4-notes`.
 - The S-Boot ramdisk porting record is on `bringup/porting-ramdisk`.
 - Tab A7 pins are in `UniXNU-gta4l/docs/build-revisions.md`.
+- The SM6115 shared source is
+  `DokuroMitsukai/UniXNU-sm6115-common` at `4137c1c1`.
+- The Tab A7 Format 2 resolver, DTS and ADT results are recorded in
+  `UniXNU-gta4l/docs/build-revisions.md`.
 - Keep source, host-build, QEMU and hardware results clearly separated.
 - Use the exact `Co-authored-by` trailers supplied in the session context.
   Never invent identities or alter the human author/committer. Preserve

@@ -17,6 +17,13 @@ Read this README and the following UniXNU documentation before changing the port
 | Verification | [Building](https://unixnu.com/building), [bring-up](https://unixnu.com/porting/bring-up) |
 | Migration | [Migration](https://unixnu.com/porting/migration) |
 
+## Repository policy
+
+Read [docs/repository-branching.md](docs/repository-branching.md) before changing
+shared repositories, merging device branches, or updating build pins. It
+records the canonical forks, integration/topic branches, local reference
+checkouts and current validation limits.
+
 ## Work
 
 Search the catalog and inspect existing component interfaces before adding code.

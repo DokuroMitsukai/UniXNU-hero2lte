@@ -64,6 +64,20 @@ The integration branch is one compatible source for both ports:
 - The S7 Edge and Tab A7 must both build from the same shared revision before
   it is treated as a common baseline.
 
+Concrete merge resolutions:
+
+- `UniXNU` `Menu.c` keeps physical `SimpleTextIn` polling and the optional
+  `0x0080` hardware power scan code. The generic key-hint string stays in
+  `UniXNUPkg.dec`; `hero2lte.dsc` overrides `PcdUniXNUMenuKeyHints`. gta4l
+  should add its own override if it wants different labels.
+- `UniXNU` `bootimg.py` keeps both the compressed-kernel path and the Tab A7
+  initrd/DTB handling.
+- `UniXNU` `payload.py` keeps FAT validation and the `entry_probe_no_stage2`
+  control.
+- `Mu-Silicium` keeps the gta4l and hero2lte platform directories separate;
+  shared BootShim and SEC changes are on the integration branch.
+- `DarwinBoot` has one shared GOP video-base commit used by both parents.
+
 If a change cannot be made compatible, keep it on a device branch and document
 the conflict. Do not hide a board-specific change in a shared default.
 

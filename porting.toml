@@ -76,12 +76,13 @@ findings = [
   "The standalone build is bit-for-bit reproducible and the DECON trigger is preserved instead of writing the Exynos 8895 value 0x1281.",
   "With UNIXNU_PAYLOAD=1 the UniXNU firmware build links UniXNU, UniXNUDxe, UniXNURamDiskDxe and DarwinBoot. FVMAIN grows from 0x20a000 to 0x235000 inside the 2 MiB FD.",
   "The safemem image with FD, stack and heap at 0xB1200000-0xBFF40000 reached UEFI. The bring-up image then toggled the timer block, accepted volume, home and power keys, and advanced the counter.",
+  "S-Boot copies the boot image ramdisk to 0x89000000 and writes no /chosen linux,initrd-start or linux,initrd-end, and the range was absent from the firmware memory map, so UniXNURamDiskDxe never published the payload and the menu fell back to the built-in configuration. MemoryMapLib now reserves 0x89000000-0x8A000000 and the DSC sets PcdUniXNURamDiskBase and PcdUniXNURamDiskSize, which the driver uses when the FDT carries no initrd.",
 ]
 completion = [
   "Firmware builds, enters UniXNU, publishes the framebuffer, keeps the payload FAT readable and preserves the reserved-memory ranges.",
 ]
 limits = [
-  "The UniXNU-integrated firmware (UNIXNU_PAYLOAD=1) has not been booted; no payload or boot image exists yet.",
+  "The payload-discovery firmware with the reserved ramdisk range and the platform initrd PCDs has not been booted.",
   "No ARM generic-timer interrupt has been delivered through the XNU path.",
 ]
 next_action = [
